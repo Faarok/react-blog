@@ -5,11 +5,11 @@ const tableName = 'category';
 const poolQuery = (query, data = []) => db.pool.promise().execute(query, data);
 
 const categoryDatabase = {
-    createCategory: async (category_name, category_parent) => {
+    createCategory: async (category_name, fk_category_parent) => {
         try
         {
-            let query = 'INSERT INTO ' + tableName + '(category_name, category_parent, category_state, category_created) VALUES (?, ?, ?, NOW())';
-            let [results] = await poolQuery(query, [category_name, category_parent, db.ACTIVE]);
+            let query = 'INSERT INTO ' + tableName + '(category_name, fk_category_parent, category_state, category_created) VALUES (?, ?, ?, NOW())';
+            let [results] = await poolQuery(query, [category_name, fk_category_parent, db.ACTIVE]);
             return results;
         }
         catch (err)
