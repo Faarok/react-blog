@@ -1,17 +1,13 @@
 import express from 'express';
 import articleController from '../controllers/article.controller.js';
+import bodyParser from 'body-parser';
 
+const jsonParser = bodyParser.json();
 
 const initArticleRoutes = (app) => {
     const router = express.Router();
 
-    router.get('/', (req, res) => articleController.readAll(req, res));
-
-    router.get('/:id', (req, res) => {
-        console.log('Route test OK');
-    });
-
-    router.post('/create', (req, res) => articleController.create(name, content, category));
+    router.post('/create', jsonParser, articleController.create);
 
     app.use('/article', router);
 };
