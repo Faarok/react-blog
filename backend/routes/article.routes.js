@@ -3,11 +3,11 @@ import articleController from '../controllers/article.controller.js';
 import bodyParser from 'body-parser';
 
 const jsonParser = bodyParser.json();
+const router = express.Router();
 
 const initArticleRoutes = (app) => {
-    const router = express.Router();
-
-    router.post('/create', jsonParser, articleController.create);
+    // router.get('/', jsonParser, articleController.get)
+    router.post('/create', jsonParser, articleController.createArticle);
 
     app.use('/article', router);
 };

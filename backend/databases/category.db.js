@@ -1,7 +1,6 @@
 import db from './init.db.js';
 
 const tableName = 'category';
-
 const poolQuery = (query, data = []) => db.pool.promise().execute(query, data);
 
 const categoryDatabase = {
