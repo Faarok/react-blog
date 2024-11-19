@@ -6,34 +6,50 @@ const articleController = {
         {
             let { name, content, category } = req.body;
 
-            if(typeof name === 'undefined' || name.length == 0)
+            if(typeof name === 'undefined' || !name || name.trim().length === 0)
                 return res.status(400).json({ error: 'Missing article name' });
-            else if(typeof content === 'undefined' || content.length == 0)
+
+            if(typeof content === 'undefined' || !content || content.trim().length === 0)
                 return res.status(400).json({ error: 'Missing article content' });
-            else if(typeof category === 'undefined' || category.length == 0)
+
+            if(typeof category === 'undefined' || !category || category.length === 0)
                 return res.status(400).json({ error: 'Missing article category' });
-            else if(isNaN(category))
-                return res.status(400).json({ error: 'Category ID must be a number' });
-            else if(!Number.isInteger(category))
-                category = parseInt(category, 10);
 
-            // TODO:
-            /**
-             * - Vérifier qu'aucune article n'existe avec le combo name + category
-             * - Créer l'article
-             */
+            category = parseInt(category);
+            if(!Number.isInteger(category) || category <= 0)
+                return res.status(400).json({ error: 'Category ID must be a positive integer' });
 
-            let articleExist = await articleDb.getArticleByFilters(name, category);
+            // TODO: Vérifier qu'aucune article n'existe avec le combo name + category
+            let filters = [
+                { column: 'article_name', operator: '=', value: name },
+                { logic: 'AND' },
+                { column: 'article_category', operator: '=', value: category },
+                { logic: 'AND' },
+                { group: [
+                    { column: 'article_createdAt', operator: '>=', value: '2024-01-01' },
+                    { logic: 'OR' },
+                    { column: 'article_isActive', operator: '=', value: true }
+                ]}
+            ];
+
+            let articleExist = await articleDb.getArticleByFilters(filters);
+
+            return console.log('fin');
+
 
             return console.log(articleExist);
+
+            // TODO: Créer l'article
+
+
 
             // let response = await articleDb
 
             return res.status(200).json({ message: 'Article created' });
         }
-        catch (error)
+        catch(error)
         {
-            console.error(err.stack);
+            console.error(error.stack);
             return res.status(400).send('Bad request');
         }
     }
