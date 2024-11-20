@@ -2,7 +2,7 @@ import mysql from 'mysql2';
 import queryBuilder from './queryBuilder.db.js';
 
 const ACTIVE = 'published';
-const INACTIVE = 'deleted';
+const DELETED = 'deleted';
 const ARCHIVED = 'archived';
 
 // details at : https://sidorares.github.io/node-mysql2/docs
@@ -24,6 +24,6 @@ pool.getConnection((err, connection) => {
     connection.release();  // Libère la connexion une fois la tâche terminée
 });
 
-const poolQuery = (query, data = []) => db.pool.promise().execute(query, data);
+const poolQuery = (query, data = []) => pool.promise().execute(query, data);
 
-export default { pool, poolQuery, queryBuilder, ACTIVE, INACTIVE, ARCHIVED };
+export default { pool, poolQuery, queryBuilder, ACTIVE, DELETED, ARCHIVED };
