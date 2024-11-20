@@ -10,19 +10,50 @@ const validOperators = {
     'NOT IN': 'NOT IN(?)',
     'BETWEEN': 'BETWEEN ? AND ?'
 };
-
 const validLogic = [ 'AND', 'OR' ];
 
 const queryBuilder = {
-    where: (filters) => {
+    query: [],
+    values: [],
+    select: function(table, columns = []) {
+        if(typeof table === 'undefined' || !table || table.length === 0)
+            throw new Error('select err: No table in parameters');
+
+        let select = 'SELECT ';
+
+        if(columns.length !== 0)
+        {
+            for(let [column, alias] of Object.entries(columns))
+            {
+                if(Number.isInteger(alias))
+                    select += `${column},`;
+                else
+                    select += `${column} AS '${alias}',`;
+            }
+
+            // Delete last coma
+            select = select.substring(0, select.length - 1);
+        }
+        else
+            select += '*';
+
+        select += '\nFROM ' + table;
+        this.query.push(select);
+        return this;
+    },
+    where: function (filters) {
+        if(typeof filters == 'undefined' || !filters || filters.length === 0)
+            throw new Error('Filters must contains data');
+
+        this.query.push('\nWHERE ' + this.buildWhereClause(filters));
+        return this;
+    },
+    buildWhereClause: function (filters) {
         try
         {
-            // console.log(filters);
-            let conditions = ['WHERE'];
-            let values = [];
+            let conditions = [];
 
             const processFilter = (filter) => {
-                // console.log(filter);
                 if(
                     typeof filter.column !== 'undefined'
                     && typeof filter.operator !== 'undefined'
@@ -30,35 +61,34 @@ const queryBuilder = {
                 )
                 {
                     let { column, operator, value } = filter;
-                    let sqlOperator = validOperators[filter.operator.trim()];
+                    let sqlOperator = validOperators[operator.trim()];
 
                     if(typeof sqlOperator === 'undefined')
-                        throw new Error(`Invalid operator: ${filter.operator}`);
+                        throw new Error(`Invalid operator: ${operator}`);
 
-                    conditions.push(`${filter.column} ${sqlOperator}`);
-                    values.push(filter.value);
+                    conditions.push(`${column} ${sqlOperator}`);
+                    this.values.push(value);
                 }
                 else if(typeof filter.logic !== 'undefined' && validLogic.includes(filter.logic.trim().toUpperCase()))
                     conditions.push(filter.logic.toUpperCase());
                 else if(typeof filter.group !== 'undefined')
                 {
-                    const { clause: groupClause, params: groupValues } = queryBuilder.where(filter.group);
+                    const groupClause = queryBuilder.buildWhereClause(filter.group);
                     conditions.push(`(${groupClause})`);
-                    values.push(...groupValues);
                 }
             }
 
             filters.forEach((filter) => processFilter(filter));
 
-            return {
-                clause: conditions.join(' '),
-                params: values
-            };
+            return conditions.join(' ');
         }
         catch(error)
         {
             console.error(error.stack);
         }
+    },
+    build: function () {
+        return this.query.join(' ');
     }
 }
 
