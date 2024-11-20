@@ -23,13 +23,7 @@ const articleController = {
             let filters = [
                 { column: 'article_name', operator: '=', value: name },
                 { logic: 'AND' },
-                { column: 'article_category', operator: '=', value: category },
-                { logic: 'AND' },
-                { group: [
-                    { column: 'article_createdAt', operator: '>=', value: '2024-01-01' },
-                    { logic: 'OR' },
-                    { column: 'article_isActive', operator: '=', value: true }
-                ]}
+                { column: 'fk_category_id', operator: '=', value: category }
             ];
 
             let articleExist = await articleDb.getArticleByFilters(filters);
