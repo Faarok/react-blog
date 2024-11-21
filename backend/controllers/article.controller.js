@@ -21,9 +21,9 @@ const articleController = {
 
             // TODO: Vérifier qu'aucune article n'existe avec le combo name + category
             let filters = [
-                { column: 'article_name', operator: '=', value: name },
+                { column: 'article_name:=', value: name },
                 { logic: 'AND' },
-                { column: 'fk_category_id', operator: '=', value: category }
+                { column: 'fk_category_id:=', value: category }
             ];
 
             let articleExist = await articleDb.getArticleByFilters(filters);
