@@ -18,9 +18,9 @@ const pool = mysql.createPool({
 
 pool.getConnection((err, connection) => {
     if(err)
-        return console.error('Erreur de connexion à la base de données :', err.stack);
+        return console.error('Database connection error:', err.stack);
 
-    console.log('Connecté à la base de données avec l\'ID :', connection.threadId);
+    console.log('Connected to database with ID:', connection.threadId);
     connection.release();  // Libère la connexion une fois la tâche terminée
 });
 
