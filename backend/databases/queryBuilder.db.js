@@ -55,12 +55,11 @@ const queryBuilder = {
 
             const processFilter = (filter) => {
                 if(
-                    typeof filter.column !== 'undefined'
-                    && typeof filter.operator !== 'undefined'
-                    && typeof filter.value !== 'undefined'
+                    typeof filter.column !== 'undefined' && filter.column && filter.column.trim().length !== 0 && typeof filter.value !== 'undefined'
                 )
                 {
-                    let { column, operator, value } = filter;
+                    let [column, operator = '='] = filter.column.includes(':') ? filter.column.split(':') : [filter.column, '='];
+                    let value = filter.value;
                     let sqlOperator = validOperators[operator.trim()];
 
                     if(typeof sqlOperator === 'undefined')
