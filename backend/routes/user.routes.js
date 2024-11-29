@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { json } from 'body-parser';
+import bodyParser from 'body-parser';
 import userController from '../controllers/user.controller.js';
 
-const jsonParser = json();
+const jsonParser = bodyParser.json();
 const router = Router();
 
 const initUserRoutes = (app) => {
