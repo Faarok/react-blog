@@ -1,10 +1,10 @@
 const tools = {
     /**
-     * Check if String is empty
+     * Check if String is a string and is empty
      *
      * @param {string} string
      * @param {boolean} falsy=false     If true, also check for falsy data (https://developer.mozilla.org/en-US/docs/Glossary/Falsy)
-     * @returns {boolean}               true if empty, otherwise, false
+     * @returns {boolean}               true if empty or is not a string, otherwise, false
      */
     isStringEmpty: function(string, falsy = false) {
         if(typeof string !== 'string')
