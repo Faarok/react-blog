@@ -1,10 +1,6 @@
 import mysql from 'mysql2';
 import queryBuilder from './queryBuilder.db.js';
 
-const ACTIVE = 'published';
-const DELETED = 'deleted';
-const ARCHIVED = 'archived';
-
 // details at : https://sidorares.github.io/node-mysql2/docs
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
@@ -26,4 +22,4 @@ pool.getConnection((err, connection) => {
 
 const poolQuery = (query, data = []) => pool.promise().execute(query, data);
 
-export default { pool, poolQuery, queryBuilder, ACTIVE, DELETED, ARCHIVED };
+export default { pool, poolQuery, queryBuilder };
