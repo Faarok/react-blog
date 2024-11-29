@@ -16,6 +16,30 @@ const tools = {
         return string.trim().length === 0;
     },
     /**
+     * Check if Array is an array and is empty
+     *
+     * @param {array} array
+     * @returns {boolean}               true if empty or is not an array, otherwise false
+     */
+    isArrayEmpty: function(array) {
+        if(typeof array !== 'array')
+            return true;
+
+        return array.length === 0;
+    },
+    /**
+     * Check if Object is an object and is empty
+     *
+     * @param {object} object
+     * @returns {boolean}               true if empty or is not an object, otherwise false
+     */
+    isObjectEmpty: function(object) {
+        if(typeof object !== 'object')
+            return true;
+
+        return Object.keys(object).length === 0;
+    },
+    /**
      * Check if string is a well formated mail address
      *
      * @param {string} mail
@@ -28,6 +52,15 @@ const tools = {
         const emailRegex = /^[a-zA-Z0-9](?!.*[._+-]{2})[a-zA-Z0-9._+-]*[a-zA-Z0-9]@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         return (emailRegex.test(mail.trim()));
+    },
+    /**
+     * Check if string is true (as bool)
+     * @param {string} str
+     * @returns {boolean}
+     */
+    strToBool: function(str)
+    {
+        return str === 'true';
     },
     /**
      * Check if string is a well formated password
