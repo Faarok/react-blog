@@ -39,13 +39,13 @@ const tools = {
      * - Length min : 8 / Length max : 32
      *
      * @param {string} password
-     * @returns {any}
+     * @returns {boolean}
      */
     validatePassword: function(password) {
         if(this.isStringEmpty(password))
             return false;
 
-        const passwordRegex = /^(?!.*\s)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,32}$/;
+        const passwordRegex = /^(?!.*\s)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[/!@#$%^&*(),.?":{}|<>]).{8,32}$/;
 
         return passwordRegex.test(password);
     }
