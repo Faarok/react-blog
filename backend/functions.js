@@ -84,4 +84,10 @@ const tools = {
     }
 }
 
-export default tools;
+const dataState = {
+    ACTIVE: 'published',
+    DELETED: 'deleted',
+    ARCHIVED: 'archived'
+}
+
+export { tools, dataState };
