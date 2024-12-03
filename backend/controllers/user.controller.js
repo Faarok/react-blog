@@ -8,6 +8,7 @@ const userController = {
         {
             let { name, firstname, mail, password, passwordConfirm } = req.body;
 
+            // Vérif nom / prénom
             if(tools.isStringEmpty(name))
                 return res.status(400).json({ error: 'Name can\'t be empty' });
 
@@ -19,9 +20,22 @@ const userController = {
             firstname = firstname.toLowerCase();
             firstname = firstname.charAt(0).toUpperCase() + firstname.slice(1);
 
+            // Vérif format mail
             if(!tools.validateEmail(mail))
                 return res.status(400).json({ error: 'Mail is in an invalid format' });
 
+            // Vérif existence mail
+            let whereUserData = [
+                { column: 'user_mail:=', value: mail },
+                { logic: 'AND' },
+                { column: 'user_state:!=', value: dataState.DELETED }
+            ];
+
+            let userExist = await userDb.getUserByFilter(whereUserData);
+            if(userExist.length !== 0)
+                return res.status(409).json({ error: 'Mail already used' });
+
+            // Vérif mot de passe
             if(!tools.validatePassword(password))
             {
                 if(password.length < 8 || password.length > 32)
@@ -35,16 +49,7 @@ const userController = {
 
             let hashedPassword = await argon2.hash(password);
 
-            let whereUserData = [
-                { column: 'user_mail:=', value: mail },
-                { logic: 'AND' },
-                { column: 'user_state:!=', value: dataState.DELETED }
-            ];
-
-            let userExist = await userDb.getUserByFilter(whereUserData);
-            if(userExist.length !== 0)
-                return res.status(409).json({ error: 'Mail already used' });
-
+            // Insertion de la donnée dans la BDD
             let insertData = {
                 columns: ['user_name', 'user_firstname', 'user_mail', 'user_password', 'user_state', 'user_date_in'],
                 values: [
@@ -54,6 +59,8 @@ const userController = {
 
             let response = await userDb.createUser(insertData);
             let responseError = response.error;
+
+            // TODO: Créer le profil à la création de l'User
 
             if(responseError)
                 return res.status(400).json({ message: responseError });
