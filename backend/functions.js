@@ -140,7 +140,7 @@ const tools = {
 
         type = type.trim().toUpperCase();
         let currentDate = this.dateNow();
-        let logDir = path.join(__dirname, 'log');
+        let logDir = path.join(__dirname, 'logs');
 
         if(!fs.existsSync(logDir))
             fs.mkdirSync(logDir, { recursive: true });
