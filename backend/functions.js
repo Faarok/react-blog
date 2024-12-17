@@ -1,3 +1,5 @@
+import moment from 'moment-timezone';
+const timezone = 'Europe/Paris';
 const tools = {
     /**
      * Check if String is a string and is empty
@@ -99,6 +101,17 @@ const tools = {
         const passwordRegex = /^(?!.*\s)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[/!@#$%^&*(),.?":{}|<>]).{8,32}$/;
 
         return passwordRegex.test(password);
+    },
+    /**
+     * Return the current date in YYYY-MM-DD HH:mm:ss format
+     * timezone is set at top of the file
+     *
+     * @returns {string}
+     */
+    dateNow: function() {
+        moment.tz.setDefault(timezone);
+        return moment().format('YYYY-MM-DD HH:mm:ss');
+    },
     }
 }
 
