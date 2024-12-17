@@ -6,7 +6,7 @@ const jsonParser = bodyParser.json();
 const router = Router();
 
 const initUserRoutes = (app) => {
-    router.post('/create', jsonParser, userController.createUser);
+    router.post('/create', jsonParser, asyncHandler(userController.createUser));
 
     app.use('/user', router);
 }

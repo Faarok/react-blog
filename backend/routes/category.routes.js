@@ -6,8 +6,8 @@ const jsonParser = bodyParser.json();
 const router = express.Router();
 
 const initCategoryRoutes = (app) => {
-    router.get('/', jsonParser, categoryController.getActiveCategories);
-    router.post('/create', jsonParser, categoryController.createCategory);
+    router.get('/', jsonParser, asyncHandler(categoryController.getActiveCategories));
+    router.post('/create', jsonParser, asyncHandler(categoryController.createCategory));
 
     app.use('/category', router);
 }

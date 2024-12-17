@@ -1,15 +1,15 @@
 import bodyParser from "body-parser";
 import { Router } from "express";
-import permissionController from "../controllers/permission.controller";
+import permissionController from "../controllers/permission.controller.js";
 
 const jsonParser = bodyParser.json();
 
-const initPermissionRoute = function(app) {
+const initPermissionRoutes = function(app) {
     const router = Router();
 
-    router.post('/create', jsonParser, permissionController.createPermission);
+    router.post('/create', jsonParser, asyncHandler(permissionController.createPermission));
 
     app.use('/permission', router);
 }
 
-export default initPermissionRoute;
+export default initPermissionRoutes;

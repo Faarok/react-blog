@@ -7,7 +7,7 @@ const router = express.Router();
 
 const initArticleRoutes = (app) => {
     // router.get('/', jsonParser, articleController.get)
-    router.post('/create', jsonParser, articleController.createArticle);
+    router.post('/create', jsonParser, asyncHandler(articleController.createArticle));
 
     app.use('/article', router);
 };
