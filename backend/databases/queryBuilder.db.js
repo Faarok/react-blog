@@ -23,12 +23,12 @@ const queryBuilder = {
     query: [],
     values: [],
     select: function(table, columns = []) {
-        if(typeof table === 'undefined' || !table || table.length === 0)
+        if(tools.isStringEmpty(table))
             throw new Error('select err: No table in parameters');
 
         let select = 'SELECT ';
 
-        if(columns.length !== 0)
+        if(!tools.isArrayEmpty(columns))
         {
             for(let [column, alias] of Object.entries(columns))
             {
@@ -44,15 +44,15 @@ const queryBuilder = {
         else
             select += '*';
 
-        select += '\nFROM ' + table;
+        select += ' FROM ' + table;
         this.query.push(select);
         return this;
     },
     where: function(filters) {
-        if(typeof filters == 'undefined' || !filters || filters.length === 0)
+        if(tools.isObjectEmpty(filters))
             throw new Error('Filters must contains data');
 
-        this.query.push('\nWHERE\n' + this.buildWhereClause(filters));
+        this.query.push('WHERE ' + this.buildWhereClause(filters));
         return this;
     },
     buildWhereClause: function(filters) {
@@ -61,7 +61,7 @@ const queryBuilder = {
             let conditions = [];
 
             const processFilter = (filter) => {
-                if(!tools.isStringEmpty(filter.column) && !tools.isStringEmpty(filter.value))
+                if(!tools.isStringEmpty(filter.column) && !tools.isEmpty(filter.value))
                 {
                     let [column, operator = '='] = filter.column.includes(':') ? filter.column.split(':') : [filter.column, '='];
                     let value = filter.value;
@@ -70,22 +70,12 @@ const queryBuilder = {
                     if(typeof sqlOperator === 'undefined')
                         throw new Error(`Invalid operator: ${operator}`);
 
-                    let condition = '';
-                    if(typeof conditions[conditions.length - 1] !== 'undefined')
-                    {
-                        if(!validLogic.some(word => conditions[conditions.length - 1].includes(word)))
-                            condition += '\t';
-                    }
-                    else
-                        condition += '\t';
+                    conditions.push(`${column} ${sqlOperator}`);
 
-                    condition += `${column} ${sqlOperator}\n`;
-
-                    conditions.push(condition);
                     this.values.push(value);
                 }
-                else if(typeof filter.logic !== 'undefined' && validLogic.includes(filter.logic.trim().toUpperCase()))
-                    conditions.push('\t' + filter.logic.toUpperCase());
+                else if(!tools.isStringEmpty(filter.logic) && validLogic.includes(filter.logic.trim().toUpperCase()))
+                    conditions.push(filter.logic.toUpperCase());
                 else if(typeof filter.group !== 'undefined')
                 {
                     const groupClause = queryBuilder.buildWhereClause(filter.group);
@@ -117,7 +107,7 @@ const queryBuilder = {
         });
 
         // Delete last coma
-        insert = insert.substring(0, insert.length - 2) + ')\nVALUES\n' + this.buildInsertClause(data);
+        insert = insert.substring(0, insert.length - 2) + ') VALUES' + this.buildInsertClause(data);
         this.query.push(insert);
         return this;
     },
@@ -126,7 +116,7 @@ const queryBuilder = {
         {
             let insertValues = '';
             filters.values.forEach(rowValue => {
-                insertValues += '\t(';
+                insertValues += ' (';
 
                 rowValue.forEach(value => {
                     if(value.includes('sql:') && value.replace('sql:', '') in validFunctions)
@@ -139,11 +129,11 @@ const queryBuilder = {
                 });
 
                 // Delete last coma
-                insertValues = insertValues.substring(0, insertValues.length - 2) + '),\n';
+                insertValues = insertValues.substring(0, insertValues.length - 2) + '),';
             });
 
             // Delete last coma
-            insertValues = insertValues.substring(0, insertValues.length - 2);
+            insertValues = insertValues.substring(0, insertValues.length - 1);
             return insertValues;
         }
         catch(error)
@@ -155,7 +145,8 @@ const queryBuilder = {
     build: function() {
         let queryJoined = this.query.join(' ');
 
-        // Debug only, see sql_debug.sql
+
+        // Debug only
         if(tools.strToBool(process.env.MYSQL_DEBUG))
         {
             let debug = queryJoined;
@@ -163,22 +154,7 @@ const queryBuilder = {
                 debug = debug.replace('?', typeof value === 'string' ? `"${value}"` : value);
             });
 
-            fs.access('../sql_debug.log', fs.constants.F_OK, (error) => {
-                if(error)
-                {
-                    fs.appendFile('sql_debug.log', moment().format('YYYY-MM-DD hh:mm:ss | ') + debug + '\n', (err) => {
-                        if(err)
-                            throw err;
-                    });
-                }
-                else
-                {
-                    fs.writeFile('sql_debug.log', moment().format('YYYY-MM-DD hh:mm:ss | ') + debug + '\n', (err) => {
-                        if(err)
-                            throw err;
-                    });
-                }
-            });
+            tools.log(debug, 'sql', 'info');
         }
 
         const result = { query: queryJoined, values: [...this.values] };
