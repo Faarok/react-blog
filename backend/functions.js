@@ -22,7 +22,7 @@ const tools = {
      * @returns {boolean}               true if empty or is not an array, otherwise false
      */
     isArrayEmpty: function(array) {
-        if(typeof array !== 'array')
+        if(!Array.isArray(array))
             return true;
 
         return array.length === 0;
