@@ -6,8 +6,8 @@ import initMiddlewares from './middlewares/init.middlewares.js';
 const app = express();
 const PORT = process.env.APP_PORT ?? 5000;
 
-initRoutes(app);
 initMiddlewares(app);
+initRoutes(app);
 
 app.listen(PORT, () => {
     if(process.env.APP_ENV == 'dev')
