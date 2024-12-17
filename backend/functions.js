@@ -160,4 +160,9 @@ const dataState = {
     ARCHIVED: 'archived'
 }
 
-export { tools, dataState };
+const permissionRange = {
+    OWN: 'own',
+    ALL: 'all'
+};
+
+export { tools, dataState, permissionRange };
