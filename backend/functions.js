@@ -39,6 +39,24 @@ const tools = {
 
         return Object.keys(object).length === 0;
     },
+    isNumberInt: function (value) {
+        return Number.isInteger(Number(value)) && /^-?\d+$/.test(String(value));
+    },
+    isEmpty: function(value) {
+        if(typeof value === 'string')
+            return this.isStringEmpty(value);
+
+        if(Array.isArray(value))
+            return this.isArrayEmpty(value);
+
+        if(typeof value === 'object')
+            return this.isObjectEmpty(value);
+
+        if(this.isNumberInt(value))
+            return false; // Un nombre entier ne peut pas être vide
+
+        return !value; // Pour les autres types (null, undefined, etc.)
+    },
     /**
      * Check if string is a well formated mail address
      *
