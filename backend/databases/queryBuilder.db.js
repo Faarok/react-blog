@@ -8,8 +8,8 @@ const validOperators = {
     '<=': '<= ?',
     '>': '> ?',
     '>=': '>= ?',
-    'IN': 'IN(?)',
-    'NOT IN': 'NOT IN(?)',
+    'IN': 'IN(_array)',
+    'NOT IN': 'NOT IN(_array)',
     'BETWEEN': 'BETWEEN ? AND ?'
 };
 const validLogic = [ 'AND', 'OR' ];
@@ -65,12 +65,25 @@ const queryBuilder = {
                     let value = filter.value;
                     let sqlOperator = validOperators[operator.trim()];
 
-                    if(typeof sqlOperator === 'undefined')
+                    if(tools.isStringEmpty(sqlOperator))
                         throw new Error(`Invalid operator: ${operator}`);
 
-                    conditions.push(`${column} ${sqlOperator}`);
+                    if(operator === 'IN' || operator === 'NOT IN')
+                    {
+                        if(!Array.isArray(value))
+                            throw new Error('Value must be an array for IN / NOT IN operation');
 
-                    this.values.push(value);
+                        let placeholders = value.map(() => '?').join(', ');
+                        sqlOperator = sqlOperator.replace('_array', placeholders);
+
+                        value.forEach(element => {
+                            this.values.push(element);
+                        });
+                    }
+                    else
+                        this.values.push(value);
+
+                    conditions.push(`${column} ${sqlOperator}`);
                 }
                 else if(!tools.isStringEmpty(filter.logic) && validLogic.includes(filter.logic.trim().toUpperCase()))
                     conditions.push(filter.logic.toUpperCase());
@@ -117,7 +130,7 @@ const queryBuilder = {
                 insertValues += ' (';
 
                 rowValue.forEach(value => {
-                    if(value.includes('sql:') && value.replace('sql:', '') in validFunctions)
+                    if(!tools.isNumberInt(value) && value.includes('sql:') && value.replace('sql:', '') in validFunctions)
                         insertValues += validFunctions[value.replace('sql:', '')] + ', ';
                     else
                     {
@@ -142,7 +155,6 @@ const queryBuilder = {
     },
     build: function() {
         let queryJoined = this.query.join(' ');
-
 
         // Debug only
         if(tools.strToBool(process.env.MYSQL_DEBUG))
