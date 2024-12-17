@@ -129,8 +129,11 @@ const tools = {
      * @returns {void}
      */
     log: function(content, scope = 'error', type = 'info') {
-        if(this.isStringEmpty(content))
+        if(this.isEmpty(content))
             return this.log('Error when inserting a log: empty content', 'error', 'ERROR');
+
+        if(typeof content === 'object')
+            content = JSON.stringify(content);
 
         if(this.isStringEmpty(scope))
             return this.log('Error when inserting a log: empty scope', 'error', 'ERROR');
