@@ -13,18 +13,36 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-pool.getConnection((err, connection) => {
-    if(err)
-    {
-        if(tools.strToBool(process.env.MYSQL_DEBUG))
-            tools.log(err.stack, 'sql_complete', 'error');
+// Fonction pour obtenir une connexion à la base de données
+const getDbConnection = async () => {
+    return new Promise((resolve, reject) => {
+        pool.getConnection((err, connection) => {
+            if (err) {
+                // Gestion des erreurs de connexion
+                if (tools.strToBool(process.env.MYSQL_DEBUG)) {
+                    tools.log(err.stack, 'sql_stack', 'error');
+                }
+                tools.log(err.message, 'sql', 'error');
+                return reject(err); // Rejeter l'erreur
+            }
 
-        return tools.log(err.message, 'sql', 'error');
+            resolve(connection); // Renvoie la connexion si aucune erreur
+        });
+    });
+};
+
+// Fonction pour effectuer une requête avec le pool de connexions
+const poolQuery = async (query, data = []) => {
+    try {
+        const connection = await getDbConnection();
+        const [rows] = await connection.promise().execute(query, data);
+        connection.release();
+        return [rows];
     }
-
-    connection.release();  // Libère la connexion une fois la tâche terminée
-});
-
-const poolQuery = (query, data = []) => pool.promise().execute(query, data);
+    catch (err)
+    {
+        throw err;
+    }
+};
 
 export default { pool, poolQuery, queryBuilder };
