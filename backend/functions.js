@@ -1,5 +1,12 @@
+import fs from 'fs';
 import moment from 'moment-timezone';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const timezone = 'Europe/Paris';
+
 const tools = {
     /**
      * Check if String is a string and is empty
@@ -112,6 +119,38 @@ const tools = {
         moment.tz.setDefault(timezone);
         return moment().format('YYYY-MM-DD HH:mm:ss');
     },
+    /**
+     * Allow to add log to whatever you want.
+     * Create folder "log" if don't exist.
+     * Create file if don't exist.
+     * @param {string} content         err.stack, err.message, for example
+     * @param {string} scope='error'   E.g : 'sql' will create an 'log/sql.log' file
+     * @param {string} type='info'     Type of log
+     * @returns {void}
+     */
+    log: function(content, scope = 'error', type = 'info') {
+        if(this.isStringEmpty(content))
+            return this.log('Error when inserting a log: empty content', 'error', 'ERROR');
+
+        if(this.isStringEmpty(scope))
+            return this.log('Error when inserting a log: empty scope', 'error', 'ERROR');
+
+        if(this.isStringEmpty(type))
+            return this.log('Error when inserting a log: empty type', 'error', 'ERROR');
+
+        type = type.trim().toUpperCase();
+        let currentDate = this.dateNow();
+        let logDir = path.join(__dirname, 'log');
+
+        if(!fs.existsSync(logDir))
+            fs.mkdirSync(logDir, { recursive: true });
+
+        let logFilePath = path.join(logDir, `${scope}.log`)
+
+        fs.appendFile(logFilePath, `${currentDate} | ${type} | ${content}\n`, (appendError) => {
+            if(appendError)
+                return this.log(appendError, 'error', 'error');
+        });
     }
 }
 
