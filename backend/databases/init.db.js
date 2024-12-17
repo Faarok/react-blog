@@ -1,5 +1,6 @@
 import mysql from 'mysql2';
 import queryBuilder from './queryBuilder.db.js';
+import { tools } from '../functions.js';
 
 // details at : https://sidorares.github.io/node-mysql2/docs
 const pool = mysql.createPool({
@@ -14,9 +15,13 @@ const pool = mysql.createPool({
 
 pool.getConnection((err, connection) => {
     if(err)
-        return console.error('Database connection error:', err.stack);
+    {
+        if(tools.strToBool(process.env.MYSQL_DEBUG))
+            tools.log(err.stack, 'sql_complete', 'error');
 
-    console.log('Connected to database with ID:', connection.threadId);
+        return tools.log(err.message, 'sql', 'error');
+    }
+
     connection.release();  // Libère la connexion une fois la tâche terminée
 });
 
