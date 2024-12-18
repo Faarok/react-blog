@@ -76,15 +76,15 @@ const roleController = {
             values: []
         };
 
+        let rowExist = await rolePermissionDb.getPermissionByRole([
+            { column: 'fk_role_id:=', value: role }
+        ]);
+        let existingPermissions = rowExist.map(row => row.fk_permission_id);
+
         for(const perm of permissions)
         {
-            let rowExist = await rolePermissionDb.getPermissionByRole([
-                { column: 'fk_role_id:=', value: role },
-                { logic: 'AND' },
-                { column: 'fk_permission_id:=', value: perm }
-            ]);
 
-            if(tools.isArrayEmpty(rowExist))
+            if(!existingPermissions.includes(perm))
                 insertData.values.push([role, perm]);
         };
 
