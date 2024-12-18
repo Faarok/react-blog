@@ -1,6 +1,7 @@
 import bodyParser from "body-parser";
 import { Router } from "express";
 import permissionController from "../controllers/permission.controller.js";
+import asyncHandler from '../middlewares/asyncHandler.middlewares.js';
 
 const jsonParser = bodyParser.json();
 

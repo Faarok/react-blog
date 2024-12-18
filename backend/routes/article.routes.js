@@ -1,6 +1,7 @@
 import express from 'express';
 import articleController from '../controllers/article.controller.js';
 import bodyParser from 'body-parser';
+import asyncHandler from '../middlewares/asyncHandler.middlewares.js';
 
 const jsonParser = bodyParser.json();
 const router = express.Router();
